@@ -151,6 +151,29 @@ app.get('/api/users', authenticateToken, (req, res) => {
 });
 
 // GET /api/bookings — ดึงข้อมูลทั้งหมด (ต้อง login)
+/**
+ * @swagger
+ * /api/bookings:
+ *   get:
+ *     summary: ดึงข้อมูลการจองทั้งหมด
+ *     description: ต้องการ JWT Token — กด Authorize ที่มุมบนขวาก่อนทดลองใช้
+ *     tags: [Bookings]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: รายการการจองทั้งหมด เรียงจากใหม่ไปเก่า
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Booking'
+ *       401:
+ *         description: ไม่ได้ส่ง Token
+ *       403:
+ *         description: Token ไม่ถูกต้องหรือหมดอายุ
+ */
 app.get('/api/bookings', authenticateToken, (req, res) => {
   db.all('SELECT * FROM bookings ORDER BY created_at DESC', [], (err, rows) => {
     if (err) return res.status(400).json({ error: err.message });
@@ -158,6 +181,35 @@ app.get('/api/bookings', authenticateToken, (req, res) => {
   });
 });
 
+
+/**
+ * @swagger
+ * /api/bookings/{id}:
+ *   get:
+ *     summary: ดึงข้อมูลการจองตาม ID
+ *     tags: [Bookings]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: ID ของการจอง
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: ข้อมูลการจอง
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Booking'
+ *       401:
+ *         description: ไม่ได้ส่ง Token
+ *       404:
+ *         description: ไม่พบข้อมูลการจอง
+ */
 // GET /api/bookings/:id — ดึงข้อมูลตาม ID (ต้อง login)
 app.get('/api/bookings/:id', authenticateToken, (req, res) => {
   db.get('SELECT * FROM bookings WHERE id = ?', [req.params.id], (err, row) => {
@@ -168,6 +220,39 @@ app.get('/api/bookings/:id', authenticateToken, (req, res) => {
 });
 
 // PUT /api/bookings/:id — อัปเดตการจอง (ต้อง login)
+/**
+ * @swagger
+ * /api/bookings/{id}:
+ *   put:
+ *     summary: แก้ไขข้อมูลการจอง
+ *     tags: [Bookings]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         example: 1
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Booking'
+ *     responses:
+ *       200:
+ *         description: แก้ไขสำเร็จ คืนข้อมูลที่อัปเดตแล้ว
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Booking'
+ *       401:
+ *         description: ไม่ได้ส่ง Token
+ *       404:
+ *         description: ไม่พบข้อมูลการจอง
+ */
 app.put('/api/bookings/:id', authenticateToken, (req, res) => {
   const { fullname, email, phone, checkin, checkout, roomtype, guests, comment } = req.body;
   const sql = `UPDATE bookings
@@ -189,6 +274,36 @@ app.put('/api/bookings/:id', authenticateToken, (req, res) => {
 });
 
 // DELETE /api/bookings/:id — ลบการจอง (ต้อง login)
+/**
+ * @swagger
+ * /api/bookings/{id}:
+ *   delete:
+ *     summary: ลบข้อมูลการจอง
+ *     tags: [Bookings]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         example: 1
+ *     responses:
+ *       200:
+ *         description: ลบสำเร็จ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message: { type: string, example: ลบข้อมูลสำเร็จ }
+ *                 id:      { type: string, example: "1" }
+ *       401:
+ *         description: ไม่ได้ส่ง Token
+ *       404:
+ *         description: ไม่พบข้อมูลการจอง
+ */
 app.delete('/api/bookings/:id', authenticateToken, (req, res) => {
   db.run('DELETE FROM bookings WHERE id = ?', [req.params.id], function(err) {
     if (err)             return res.status(400).json({ error: err.message });
