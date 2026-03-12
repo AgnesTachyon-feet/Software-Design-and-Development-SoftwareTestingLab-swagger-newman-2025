@@ -519,8 +519,8 @@ npm run dev
 4. **คัดลอก token** จาก Response body
 
 ```
-Response Code         : ______
-Token (15 ตัวแรก)     : ______________________________...
+Response Code         : 200
+Token (15 ตัวแรก)     : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 ### 📸 แทรกภาพหน้าจอ Swagger UI — POST /api/login Response ที่นี่
@@ -539,14 +539,18 @@ Token (15 ตัวแรก)     : ______________________________...
 
 | Endpoint | Method | Auth | Expected Code | Actual Code |
 |----------|--------|:----:|:------------:|:-----------:|
-| `/api/bookings` | POST | ❌ | 201 | |
-| `/api/bookings` | GET | ✅ | 200 | |
-| `/api/bookings/1` | GET | ✅ | 200 หรือ 404 | |
-| `/api/bookings/1` | PUT | ✅ | 200 หรือ 404 | |
-| `/api/bookings/1` | DELETE | ✅ | 200 หรือ 404 | |
+| `/api/bookings` | POST | ❌ | 201 | 201 |
+| `/api/bookings` | GET | ✅ | 200 | 200 |
+| `/api/bookings/1` | GET | ✅ | 200 หรือ 404 | 200 |
+| `/api/bookings/1` | PUT | ✅ | 200 หรือ 404 | 200 |
+| `/api/bookings/1` | DELETE | ✅ | 200 หรือ 404 | 200 |
 
 ### 📸 แทรกภาพหน้าจอ Swagger UI — GET /api/bookings Response ที่นี่
-![Swagger UI-POST /api/bookings response]('images/swagger-UI-Response.png')
+![alt text](image-3.png)
+![alt text](image-4.png)
+![alt text](image-5.png)
+![alt text](image-6.png)
+![alt text](image-7.png)
 ---
 
 **ขั้นที่ 4 — ทดสอบกรณีไม่มี Token**
@@ -554,8 +558,8 @@ Token (15 ตัวแรก)     : ______________________________...
 กดปุ่ม **Authorize** → **Logout** → **Close** แล้วลอง GET /api/bookings ใหม่:
 
 ```
-Response Code เมื่อไม่มี Token : ______
-Error message ที่ได้รับ        : ______________________________
+Response Code เมื่อไม่มี Token : 401
+Error message ที่ได้รับ        : "error": "กรุณาเข้าสู่ระบบก่อน"
 ```
 
 ---

@@ -1,20 +1,19 @@
-const express    = require('express');
-const cors       = require('cors');
-const jwt        = require('jsonwebtoken');
-const bcrypt     = require('bcryptjs');
-const db         = require('./database');
+const express = require('express');
+const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const db = require('./database');
 
-const app        = express();
-const PORT       = 3001;
+const swaggerJsdoc = require('swagger-jsdoc');       // ย้ายขึ้นมาก่อน
+const swaggerUi = require('swagger-ui-express');
+
+const app = express();
+const PORT = 3001;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const spec = swaggerJsdoc(options); 
-const swaggerJsdoc = require('swagger-jsdoc');       // อ่าน JSDoc comment → สร้าง spec
-const swaggerUi    = require('swagger-ui-express');
 
+/* เพิ่ม middleware ที่ขาด */
 app.use(cors());
-app.use(express.json()); // Express 4.16+ — ไม่ต้องใช้ body-parser อีกต่อไป
-app.use('/api-docs', swaggerUi(spec));
-app.post('/api/login', loginHandler);
+app.use(express.json());
 
 // Middleware: ตรวจสอบ JWT Token ก่อนเข้าถึง protected routes
 const authenticateToken = (req, res, next) => {
@@ -61,6 +60,7 @@ const authenticateToken = (req, res, next) => {
  *         content:
  *           application/json:
  *             schema:
+ *              $ref: '#/components/schemas/LoginResponse'
  *               type: object
  *               properties:
  *                 token:
@@ -85,7 +85,7 @@ app.post('/api/login', (req, res) => {
   }
 
   db.get('SELECT * FROM users WHERE username = ?', [username], async (err, user) => {
-    if (err)   return res.status(500).json({ error: err.message });
+    if (err) return res.status(500).json({ error: err.message });
     if (!user) return res.status(401).json({ error: 'ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง' });
 
     const validPassword = await bcrypt.compare(password, user.password);
@@ -134,7 +134,7 @@ app.post('/api/bookings', (req, res) => {
   const sql = `INSERT INTO bookings (fullname, email, phone, checkin, checkout, roomtype, guests)
                VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
-  db.run(sql, [fullname, email, phone, checkin, checkout, roomtype, guests], function(err) {
+  db.run(sql, [fullname, email, phone, checkin, checkout, roomtype, guests], function (err) {
     if (err) return res.status(400).json({ error: err.message });
     db.get('SELECT * FROM bookings WHERE id = ?', [this.lastID], (err, row) => {
       if (err) return res.status(400).json({ error: err.message });
@@ -213,7 +213,7 @@ app.get('/api/bookings', authenticateToken, (req, res) => {
 // GET /api/bookings/:id — ดึงข้อมูลตาม ID (ต้อง login)
 app.get('/api/bookings/:id', authenticateToken, (req, res) => {
   db.get('SELECT * FROM bookings WHERE id = ?', [req.params.id], (err, row) => {
-    if (err)  return res.status(400).json({ error: err.message });
+    if (err) return res.status(400).json({ error: err.message });
     if (!row) return res.status(404).json({ error: 'ไม่พบข้อมูลการจอง' });
     res.json(row);
   });
@@ -261,8 +261,8 @@ app.put('/api/bookings/:id', authenticateToken, (req, res) => {
                WHERE id=?`;
 
   db.run(sql, [fullname, email, phone, checkin, checkout, roomtype, guests, comment, req.params.id],
-    function(err) {
-      if (err)             return res.status(400).json({ error: err.message });
+    function (err) {
+      if (err) return res.status(400).json({ error: err.message });
       if (this.changes === 0) return res.status(404).json({ error: 'ไม่พบข้อมูลการจอง' });
 
       db.get('SELECT * FROM bookings WHERE id = ?', [req.params.id], (err, row) => {
@@ -305,8 +305,8 @@ app.put('/api/bookings/:id', authenticateToken, (req, res) => {
  *         description: ไม่พบข้อมูลการจอง
  */
 app.delete('/api/bookings/:id', authenticateToken, (req, res) => {
-  db.run('DELETE FROM bookings WHERE id = ?', [req.params.id], function(err) {
-    if (err)             return res.status(400).json({ error: err.message });
+  db.run('DELETE FROM bookings WHERE id = ?', [req.params.id], function (err) {
+    if (err) return res.status(400).json({ error: err.message });
     if (this.changes === 0) return res.status(404).json({ error: 'ไม่พบข้อมูลการจอง' });
     res.json({ message: "ลบข้อมูลสำเร็จโดย อรัญชัย คำเพ็ญ", id: req.params.id });
   });
@@ -318,8 +318,8 @@ const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title:       'Hotel Booking API',
-      version:     '1.0.0',
+      title: 'Hotel Booking API',
+      version: '1.0.0',
       description: 'REST API สำหรับระบบจองห้องพักออนไลน์ — ใบงาน Lab02A',
     },
     servers: [
@@ -329,8 +329,8 @@ const swaggerOptions = {
       // Security Scheme — บอก Swagger ว่า API ใช้ Bearer JWT
       securitySchemes: {
         bearerAuth: {
-          type:         'http',
-          scheme:       'bearer',
+          type: 'http',
+          scheme: 'bearer',
           bearerFormat: 'JWT',
         },
       },
@@ -340,17 +340,34 @@ const swaggerOptions = {
           type: 'object',
           required: ['fullname', 'email', 'phone', 'checkin', 'checkout', 'roomtype', 'guests'],
           properties: {
-            id:         { type: 'integer', example: 1 },
-            fullname:   { type: 'string',  example: 'สมชาย ใจดี' },
-            email:      { type: 'string',  format: 'email', example: 'somchai@example.com' },
-            phone:      { type: 'string',  example: '0812345678' },
-            checkin:    { type: 'string',  format: 'date',  example: '2026-12-01' },
-            checkout:   { type: 'string',  format: 'date',  example: '2026-12-03' },
-            roomtype:   { type: 'string',  enum: ['standard', 'deluxe', 'suite'], example: 'standard' },
-            guests:     { type: 'integer', minimum: 1, maximum: 4, example: 2 },
-            status:     { type: 'string',  example: 'pending' },
-            comment:    { type: 'string',  example: 'ต้องการห้องชั้นล่าง' },
-            created_at: { type: 'string',  example: '2026-01-01T00:00:00.000Z' },
+            id: { type: 'integer', example: 1 },
+            fullname: { type: 'string', example: 'สมชาย ใจดี' },
+            email: { type: 'string', format: 'email', example: 'somchai@example.com' },
+            phone: { type: 'string', example: '0812345678' },
+            checkin: { type: 'string', format: 'date', example: '2026-12-01' },
+            checkout: { type: 'string', format: 'date', example: '2026-12-03' },
+            roomtype: { type: 'string', enum: ['standard', 'deluxe', 'suite'], example: 'standard' },
+            guests: { type: 'integer', minimum: 1, maximum: 4, example: 2 },
+            status: { type: 'string', example: 'pending' },
+            comment: { type: 'string', example: 'ต้องการห้องชั้นล่าง' },
+            created_at: { type: 'string', example: '2026-01-01T00:00:00.000Z' },
+          },
+          LoginResponse: {
+            type: 'object',
+            properties: {
+              token: {
+                type: 'string',
+                description: ' แก้ไข Login Response description โดย อรัญชัย คำเพ็ญ'  // ← แก้ไข description เป็นการระบุว่า แก้ไข Login Response description โดยใคร
+              },
+              user: {
+                type: 'object',
+                properties: {
+                  id: { type: 'integer' },
+                  username: { type: 'string' },
+                  role: { type: 'string', enum: ['admin', 'user'] }
+                }
+              }
+            }
           },
         },
       },
@@ -362,8 +379,7 @@ const swaggerOptions = {
 
 // สร้าง OpenAPI spec จาก options และ @swagger comments ในไฟล์
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
-
-// Mount Swagger UI ที่ path /api-docs
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Mount Swagger UI ที่ path /api-docs
 
 console.log('📄 Swagger UI: http://localhost:3001/api-docs');
