@@ -82,8 +82,8 @@ const collection = {
         body: {
           mode: 'raw',
           raw: JSON.stringify({
-            fullname: 'นักศึกษา ทดสอบ Newman', email: 'newman@test.com',
-            phone: '0812345678', checkin: '2026-12-01', checkout: '2026-12-03',
+            fullname: 'อรัญชัย คำเพ็ญ', email: '68030316@gmail.com',
+            phone: '0800910190', checkin: '2026-03-06', checkout: '2026-03-13',
             roomtype: 'standard', guests: 2
           })
         },
