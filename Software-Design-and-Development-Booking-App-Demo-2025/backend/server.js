@@ -61,17 +61,6 @@ const authenticateToken = (req, res, next) => {
  *           application/json:
  *             schema:
  *              $ref: '#/components/schemas/LoginResponse'
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
- *                 user:
- *                   type: object
- *                   properties:
- *                     id:       { type: integer, example: 1 }
- *                     username: { type: string,  example: admin }
- *                     role:     { type: string,  example: admin }
  *       400:
  *         description: ไม่ได้ส่ง username หรือ password
  *       401:
@@ -312,6 +301,33 @@ app.delete('/api/bookings/:id', authenticateToken, (req, res) => {
   });
 });
 
+/**
+ * @swagger
+ * /api/health:
+ *   get:
+ *     summary: ตรวจสอบสถานะของ Server
+ *     description: ใช้สำหรับ Health Check — ไม่ต้องการ Authentication
+ *     tags: [System]
+ *     responses:
+ *       200:
+ *         description: Server ทำงานปกติ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:  { type: string,  example: ok }
+ *                 uptime:  { type: number,  example: 120.5 }
+ *                 time:    { type: string,  example: '2026-01-01T00:00:00.000Z' }
+ */
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    uptime: process.uptime(),    // จำนวนวินาทีที่ server รันมา
+    time:   new Date().toISOString()
+  });
+});
+
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 const swaggerOptions = {
@@ -336,23 +352,7 @@ const swaggerOptions = {
       },
       // Schema — โครงสร้างข้อมูลที่ใช้ซ้ำใน Request/Response
       schemas: {
-        Booking: {
-          type: 'object',
-          required: ['fullname', 'email', 'phone', 'checkin', 'checkout', 'roomtype', 'guests'],
-          properties: {
-            id: { type: 'integer', example: 1 },
-            fullname: { type: 'string', example: 'สมชาย ใจดี' },
-            email: { type: 'string', format: 'email', example: 'somchai@example.com' },
-            phone: { type: 'string', example: '0812345678' },
-            checkin: { type: 'string', format: 'date', example: '2026-12-01' },
-            checkout: { type: 'string', format: 'date', example: '2026-12-03' },
-            roomtype: { type: 'string', enum: ['standard', 'deluxe', 'suite'], example: 'standard' },
-            guests: { type: 'integer', minimum: 1, maximum: 4, example: 2 },
-            status: { type: 'string', example: 'pending' },
-            comment: { type: 'string', example: 'ต้องการห้องชั้นล่าง' },
-            created_at: { type: 'string', example: '2026-01-01T00:00:00.000Z' },
-          },
-          LoginResponse: {
+        LoginResponse: {
             type: 'object',
             properties: {
               token: {
@@ -368,6 +368,22 @@ const swaggerOptions = {
                 }
               }
             }
+          },
+        Booking: {
+          type: 'object',
+          required: ['fullname', 'email', 'phone', 'checkin', 'checkout', 'roomtype', 'guests'],
+          properties: {
+            id: { type: 'integer', example: 1 },
+            fullname: { type: 'string', example: 'สมชาย ใจดี' },
+            email: { type: 'string', format: 'email', example: 'somchai@example.com' },
+            phone: { type: 'string', example: '0812345678' },
+            checkin: { type: 'string', format: 'date', example: '2026-12-01' },
+            checkout: { type: 'string', format: 'date', example: '2026-12-03' },
+            roomtype: { type: 'string', enum: ['standard', 'deluxe', 'suite'], example: 'standard' },
+            guests: { type: 'integer', minimum: 1, maximum: 4, example: 2 },
+            status: { type: 'string', example: 'pending' },
+            comment: { type: 'string', example: 'ต้องการห้องชั้นล่าง' },
+            created_at: { type: 'string', example: '2026-01-01T00:00:00.000Z' },
           },
         },
       },

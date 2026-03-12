@@ -524,7 +524,7 @@ Token (15 ตัวแรก)     : eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```
 
 ### 📸 แทรกภาพหน้าจอ Swagger UI — POST /api/login Response ที่นี่
-![Swagger UI-POST /api/login response](images/swagger-UI-Response.png)
+![alt text](image-10.png)
 ---
 
 **ขั้นที่ 2 — ตั้งค่า Authorization**
@@ -618,7 +618,7 @@ LoginResponse: {
 ```
 
 📸 แทรกภาพหน้าจอ Swagger UI ที่แสดง Schema `LoginResponse` ใน Models section:
-![Swagger UI-POST LoginResponse](images/swagger-UI-Response.png)
+![alt text](image-8.png)
 > ___
 
 ---
@@ -657,7 +657,7 @@ app.get('/api/health', (req, res) => {
 ```
 
 📸 แทรกภาพหน้าจอ Swagger UI ที่แสดง /api/health endpoint และ Response จริง:
-![Swagger UI-health check](images/swagger-UI-Response.png)
+![alt text](image-9.png)
 > ___
 
 ---
@@ -674,11 +674,10 @@ app.get('/api/health', (req, res) => {
 Login ใน Swagger UI → Authorize → รอ 6 วินาที → ลอง GET /api/bookings:
 
 ```
-Response Code หลัง token หมดอายุ : ______
-Error message                    : ______________________________
-ข้อแตกต่างระหว่าง 401 กับ 403   : ______________________________
+Response Code หลัง token หมดอายุ : 403
+Error message                    : "error": "Token ไม่ถูกต้องหรือหมดอายุ"
+ข้อแตกต่างระหว่าง 401 กับ 403   : 401 ไม่ได้ส่ง Token 403 Token ไม่ถูกต้องหรือหมดอายุ
 ```
-
 > แก้กลับเป็น `'1h'` ก่อนทำส่วนที่ 2
 
 ---
@@ -1110,6 +1109,8 @@ pm.test("____________________________", function() {
 #   -r    = Reporter ที่ต้องการ (cli, htmlextra, junit)
 #   --reporter-htmlextra-export = path ของ HTML Report
 # ────────────────────────────────────────────────────────────
+npx newman run newman/hotel-booking-collection.json \ -e newman/hotel-booking-env.json
+npx newman run newman/hotel-booking-collection.json -e newman/hotel-booking-env.json -r cli,htmlextra --reporter-htmlextra-export ./reports/api-test-report.html --reporter-htmlextra-title "Hotel Booking API Test Report"
 
 # รันพื้นฐาน
 npx newman run newman/hotel-booking-collection.json \
@@ -1122,7 +1123,7 @@ npx newman run newman/hotel-booking-collection.json \
   --reporter-htmlextra-export ./reports/api-test-report.html \
   --reporter-htmlextra-title "Hotel Booking API Test Report"
 ```
-
+hotel-booking-env.json
 **บันทึกผลการรัน Newman:**
 
 ```
