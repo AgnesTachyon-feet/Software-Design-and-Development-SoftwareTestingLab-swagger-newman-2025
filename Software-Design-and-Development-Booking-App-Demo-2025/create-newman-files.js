@@ -51,7 +51,11 @@ const collection = {
         '});',
         'pm.test("Response time is less than 2000ms", function() {',
         '  pm.expect(pm.response.responseTime).to.be.below(2000);',
-        '});'
+        '});',
+        'pm.test("user.id is a positive number", function() {',
+        '  const d = pm.response.json();',
+        '  pm.expect(d.user.id).to.be.a("number").and.above(0);',
+'});'
       ]}}],
       request: {
         method: 'POST',
@@ -219,6 +223,20 @@ const collection = {
           host: ['{{baseUrl}}'], path: ['api', 'bookings', '{{bookingId}}']
         }
       }
+    },
+    // ── Request 8: POST /api/login — Wrong Password
+    {
+    name: '8. POST /api/login — Wrong Password',
+    event: [{ listen: 'test', script: { type: 'text/javascript', exec: [
+      // เขียน pm.test() ตรวจสอบ Status 401 และ error message ที่นี่
+      'pm.response.to.have.status(401);',
+    ]}}],
+    request: {
+      method: 'POST',
+      header: [{ key: 'Content-Type', value: 'application/json' }],
+      body: { mode: 'raw', raw: JSON.stringify({ username: 'admin', password: 'wrongpassword' }) },
+      url: { raw: '{{baseUrl}}/api/login', host: ['{{baseUrl}}'], path: ['api', 'login'] }
+        }
     }
   ]
 };

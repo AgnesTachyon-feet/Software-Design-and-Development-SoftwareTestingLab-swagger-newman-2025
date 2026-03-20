@@ -1180,8 +1180,7 @@ npx newman run newman/hotel-booking-collection.json \
 ```
 
 📸 ตรวจสอบหน้า Report แทรกภาพหน้าจอที่เห็นชื่อนักศึกษา:
-
-![หน้าจอ Newman Report ที่แก้ไขข้อมูลแล้ว]('images/Newman report-edit.png')
+![alt text](image-12.png)
 
 > ___
 
@@ -1205,8 +1204,8 @@ npx newman run newman/hotel-booking-collection.json -e newman/hotel-booking-env.
 
 บันทึกผล:
 📸 หน้าจอผล Error:
+![alt text](image-13.png)
 
-![หน้าจอ Newman Error]('images/Newman Error.png')
 
 
 > 💡 **จุดประสงค์:** Environment Variable `baseUrl` ส่งผลต่อทุก Request — นี่คือเหตุผลที่ต้องใช้ตัวแปรแทนการพิมพ์ URL ซ้ำ
@@ -1233,8 +1232,8 @@ npx newman run newman/hotel-booking-collection.json -e newman/hotel-booking-env.
 ```
 
 ```
-Assertions ก่อนเพิ่ม : ______
-Assertions หลังเพิ่ม : ______
+Assertions ก่อนเพิ่ม : 16
+Assertions หลังเพิ่ม : 17
 ```
 
 ---
@@ -1265,11 +1264,8 @@ Assertions หลังเพิ่ม : ______
 
 📸 แทรกภาพหน้าจอ Newman ที่แสดง Request 8 ผ่าน (Pass):
 
-> ___
+> ![alt text](image-15.png)
 
----
-
----
 
 ## แบบทดสอบ
 1. สร้าง API เพิ่มเติม เพื่อรองรับการ CheckIn โดยมีการระบุ ID ของการจอง เพื่อใช้ CheckIn และใช้การจำลองข้อมูล JSON (ทำ Mockup) เพื่อส่ง Response ผลการ CheckIn กลับไป (นักศึกษาออกแบบ API ของตนเอง และให้เพิ่ม Comment ใน Code ให้ใส่ชื่อ และรหัสนักศึกษาเพื่อระบุว่าแก้ไขโดยใคร)
